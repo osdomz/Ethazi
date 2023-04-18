@@ -1,7 +1,6 @@
 package agenciadeviajes;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 
 public class Vuelos {
     private String codV;
@@ -13,18 +12,18 @@ public class Vuelos {
     private LocalDate fechaSalida;
     private LocalDate fechaLlegada;
     
-    public ArrayList<Vuelos> listaV;
+    //private ArrayList<Vuelos> listaV = new ArrayList<Vuelos>();
     
-    public Vuelos(ArrayList<Vuelos> listaV) {
+    /*public Vuelos(ArrayList<Vuelos> listaV) {
     	 this.listaV = new ArrayList<Vuelos>();        // Agregar los hoteles a la lista aquí
-    }
+    }*/
     
-    public void fillDataV() {
+    /*public void fillDataV() {
     	listaV.add(new Vuelos ("V1", "AVIANCA", "TURISTA", "ESPAÑA", "COLOMBIA", 600.00, null, null));
     	listaV.add(new Vuelos ("V2", "LATAM", "TURISTA", "ESPAÑA", "ARGENTINA", 650.00, null, null));
     	listaV.add(new Vuelos ("V3", "AIRLINE", "PRIMERA CLASE", "ESPAÑA", "PANAMA", 200.00, null, null));
        
-        }
+        }*/
 
     public Vuelos(String codV, String aerolinea, String clase, String origen, String destino, double precio, LocalDate fechaSalida, LocalDate fechaLlegada) {
         this.codV = codV;

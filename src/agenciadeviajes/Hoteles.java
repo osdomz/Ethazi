@@ -1,7 +1,5 @@
 package agenciadeviajes;
 
-import java.util.ArrayList;
-
 public class Hoteles {
     private String codH;
     private String nombre;
@@ -11,7 +9,7 @@ public class Hoteles {
     private String tiempo;
     private double precio;
 
-    private ArrayList<Hoteles> listaH = new ArrayList<Hoteles>();
+    //private ArrayList<Hoteles> listaH = new ArrayList<Hoteles>();
 
     public Hoteles(String codH, String nombre, String direccion, String tipo, int numEstrellas, String tiempo, double precio) {
         this.codH = codH;
@@ -21,32 +19,6 @@ public class Hoteles {
         this.numEstrellas = numEstrellas;
         this.tiempo = tiempo;
         this.precio = precio;
-    }
-
-    public Hoteles() {
-		// TODO Auto-generated constructor stub
-	}
-
-	public ArrayList<Hoteles> getListaH() {
-        return listaH;
-    }
-
-    public void setListaH(ArrayList<Hoteles> listaH) {
-        this.listaH = listaH;
-    }
-
-    // Rellena la lista de hoteles con algunos hoteles predefinidos
-    public void fillDataH() {
-        listaH.add(new Hoteles("H1", "HOTEL DIAMANTE", "AV.3N", "CLASSIC", 3, "24H", 50.00));
-        listaH.add(new Hoteles("H2", "HOTEL DULCES SUEÑOS", "AV.3N", "GOLD", 4, "24H", 70.00));
-        listaH.add(new Hoteles("H3", "HOTEL CALIFORNIA", "AV.3N", "PLATINUM", 5, "24H", 100.00));
-    }
-
-    // Imprime la lista de hoteles
-    public void imprimirListaHoteles() {
-        for (Hoteles hotel : listaH) {
-            System.out.println(hotel.toString());
-        }
     }
 
     public String getCodH() {

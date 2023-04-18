@@ -6,33 +6,34 @@ import java.util.List;
 
 public class ReservasV {
     
-    private int numRV;
+	private static int numRV = 0; // Inicializar numRH a 0
     private LocalDate fechaRV;
-    private String dni;
-    private String codV;
+    //private String dni;
+    //private String codH;
+    private Clientes clientes; // Cambiar a Cliente en lugar de ArrayList<Cliente>
+    private Socios socios; // Cambiar a Socio en lugar de ArrayList<Socio>
+    private Vuelos vuelos; // Cambiar a Hotel en lugar de ArrayList<Hotel>
     
-    private static List<ReservasV> reservasv = new ArrayList<>();
+   private static List<ReservasV> reservasv = new ArrayList<>();
 
     
-    public ReservasV(int numRV, LocalDate fechaRV, String dni, String codV) {
-        this.numRV = numRV;
-        this.fechaRV = fechaRV;
-        this.dni = dni;
-        this.codV = codV;
-        reservasv.add(this);
+    public ReservasV(Clientes cliente, Socios socio, Vuelos vuelo) {
+    	this.clientes = cliente;
+        this.socios = socio;
+        this.vuelos = vuelo;
+        ReservasV.numRV++; // Incrementar numRH en 1
+        this.fechaRV = LocalDate.now();
+        //this.dni = cliente.getDni(); // Obtener el DNI del cliente
+        //this.codH = hotel.getCodH(); // Obtener el código del hotel
 
     }
 
-	public ReservasV(ArrayList<ReservasV> listaReservasV) {
+	/*public ReservasV(ArrayList<ReservasV> listaReservasV) {
 		// TODO Auto-generated constructor stub
-	}
+	}*/
 
-	public int getNumRV() {
+	public static int getNumRV() {
 		return numRV;
-	}
-
-	public void setNumRV(int numRV) {
-		this.numRV = numRV;
 	}
 
 	public LocalDate getFechaRV() {
@@ -40,57 +41,43 @@ public class ReservasV {
 	}
 
 	public void setFechaRV(LocalDate fechaRV) {
-		this.fechaRV = fechaRV;
 	}
+	// Método getter para el atributo cliente
+    public Clientes getCliente() {
+        return clientes;
+    }
+ // Método getter para el atributo socio
+    public Socios getSocios() {
+        return socios;
+    }
 
-	public String getDni() {
-		return dni;
-	}
-
-	public void setDni(String dni) {
-		this.dni = dni;
-	}
-
-	public String getCodV() {
-		return codV;
-	}
-
-	public void setCodV(String codV) {
-		this.codV = codV;
-	}
-
-	@Override
-	public String toString() {
-		return "ReservasV [numRV=" + numRV + ", fechaRV=" + fechaRV + ", dni=" + dni + ", codV=" + codV + "]";
-	}
-	public List<ReservasV> consultarReservasClienteV(String dni) {
-	    List<ReservasV> reservasCliente = new ArrayList<>();
-	    for (ReservasV reservav : reservasv) {
-	        if (reservav.getDni().equals(dni)) {
-	            reservasCliente.add(reservav);
-	        }
-	    }
-	    return reservasCliente;
+    // Método getter para el atributo dni
+    //public void getDni(String dni) {
+     //   this.dni = dni;
+    //}
+    public void setCodV(String codV) {
+		// TODO Auto-generated method stub
+		
 	}
 	
-	public List<ReservasV> consultarReservasSocioV(String dni) {
-	    List<ReservasV> reservasSocio = new ArrayList<>();
-	    for (ReservasV reservav : reservasv) {
-	        if (reservav.getDni().equals(dni)) {
-	            reservasSocio.add(reservav);
-	        }
-	    }
-	    return reservasSocio;
+
+    @Override
+    public String toString() {
+        String dni = "";
+        if (clientes instanceof Clientes) {
+            dni = ((Clientes) clientes).getDni();
+        } else if (socios instanceof Socios) {
+            dni = ((Socios) socios).getDni();
+        }
+        return "Reserva [numRH=" + numRV + ", fechaRH=" + fechaRV + ", dni=" + dni + ", codH=" + vuelos.getCodV() + "]";
+    }
+
+	public static List<ReservasV> getReservasv() {
+		return reservasv;
 	}
-	
-	public void anularReservaV(int numReserva) {
-	    for (ReservasV reservav : reservasv) {
-	        if (reservav.getNumRV() == numReserva) {
-	            reservasv.remove(reservav);
-	            break;
-	        }
-	        
-	    }
-	} 
+
+	public static void setReservasv(List<ReservasV> reservasv) {
+		ReservasV.reservasv = reservasv;
+	}
 }
    

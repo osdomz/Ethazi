@@ -12,24 +12,23 @@ public class Clientes extends Personas {
 
     private int numCliente;
 
-    static ArrayList<Clientes> listaClientes = new ArrayList<Clientes>();
+    //static ArrayList<Clientes> listaClientes = new ArrayList<Clientes>();
 
-    public void fillDataC() {
+    /*public void fillDataC() {
         listaClientes.add(new Clientes("1234C", "CHRISTIAN", "OSPINA", "DOMINGUEZ", 25, "631726686", "C_OSPINA@FPZORNOTZA.COM", 1));
         listaClientes.add(new Clientes("1235C", "MARIA", "MARTINEZ", "GOMEZ", 32, "631726687", "M_MARTINEZ@FPZORNOTZA.COM", 2));
         listaClientes.add(new Clientes("1236C", "ANDRES", "RODRIGUEZ", "SUAREZ", 27, "631726688", "A_RODRIGUEZ@FPZORNOTZA.COM", 3));
-
-    }
+    }*/
 
     public Clientes(String dni, String nombre, String apellido1, String apellido2, int edad, String telefono, String email, int numCliente) {
         super(dni, nombre, apellido1, apellido2, edad, telefono, email);
         this.numCliente = numCliente;
     }
-
+/*
     public Clientes(ArrayList<Clientes> arrayList) {
         listaClientes = new ArrayList<Clientes>(arrayList);
     }
-
+*/
     public int getNumCliente() {
         return numCliente;
     }
@@ -67,8 +66,8 @@ public class Clientes extends Personas {
         this.setApellido2(sc.nextLine());
         System.out.println("Introduce tu edad");
         this.setEdad(sc.nextInt());
-        while (this.getEdad() < 0) {
-            System.out.println("ERROR, tu edad debe ser mayor a 0");
+        while (this.getEdad() <= 17) {
+            System.out.println("ERROR, tu edad debe ser mayor a 18");
             System.out.println("Introduce de nuevo");
             this.setEdad(sc.nextInt());
         }
@@ -81,10 +80,10 @@ public class Clientes extends Personas {
         this.numCliente = sc.nextInt();
     }
 
-    public static ArrayList<Clientes> getListaClientes() {
+/*    public static ArrayList<Clientes> getListaClientes() {
         return listaClientes;
     }
-
+*/
     public void agregarReserva(ReservasH reservash) {
         reservasH.add(reservash);
     }
