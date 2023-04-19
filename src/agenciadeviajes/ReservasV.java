@@ -21,7 +21,7 @@ public class ReservasV {
     	this.clientes = cliente;
         this.socios = socio;
         this.vuelos = vuelo;
-        ReservasV.numRV++; // Incrementar numRH en 1
+        ReservasV.numRV = (int) (Math.random() * 1000) + 1; // Generar un número aleatorio entre 1 y 1000
         this.fechaRV = LocalDate.now();
         //this.dni = cliente.getDni(); // Obtener el DNI del cliente
         //this.codH = hotel.getCodH(); // Obtener el código del hotel
@@ -43,19 +43,25 @@ public class ReservasV {
 	public void setFechaRV(LocalDate fechaRV) {
 	}
 	// Método getter para el atributo cliente
-    public Clientes getCliente() {
+    public Clientes getClientes() {
         return clientes;
+    }
+    public void setClientes(Clientes cliente) {
+    	
     }
  // Método getter para el atributo socio
     public Socios getSocios() {
         return socios;
+    }
+    public void setSocios(Socios socio) {
+    	
     }
 
     // Método getter para el atributo dni
     //public void getDni(String dni) {
      //   this.dni = dni;
     //}
-    public void setCodV(String codV) {
+    public void setCodV(Vuelos nuevoVueloElegido) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -69,7 +75,7 @@ public class ReservasV {
         } else if (socios instanceof Socios) {
             dni = ((Socios) socios).getDni();
         }
-        return "Reserva [numRH=" + numRV + ", fechaRH=" + fechaRV + ", dni=" + dni + ", codH=" + vuelos.getCodV() + "]";
+        return "Reserva [numRV=" + numRV + ", fechaRH=" + fechaRV + ", dni=" + dni + ", codV=" + vuelos.getCodV() + "]";
     }
 
 	public static List<ReservasV> getReservasv() {
@@ -78,6 +84,15 @@ public class ReservasV {
 
 	public static void setReservasv(List<ReservasV> reservasv) {
 		ReservasV.reservasv = reservasv;
+	}
+	public void setVuelos(Vuelos nuevoVueloElegido) {
+	    this.vuelos = nuevoVueloElegido;
+	}
+	public void eliminarReservaV(ReservasV reserva) {
+	    this.reservasv.remove(reserva);
+	    reserva.setClientes(null);
+	    reserva.setSocios(null);
+	    reserva.setCodV(null);
 	}
 }
    

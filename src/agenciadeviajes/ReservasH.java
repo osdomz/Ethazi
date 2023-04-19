@@ -21,7 +21,7 @@ public class ReservasH {
         this.clientes = cliente;
         this.socios = socio;
         this.hoteles = hotel;
-        ReservasH.numRH++; // Incrementar numRH en 1
+        ReservasH.numRH = (int) (Math.random() * 1000) + 1; // Generar un número aleatorio entre 1 y 1000
         this.fechaRH = LocalDate.now();
         //this.dni = cliente.getDni(); // Obtener el DNI del cliente
         //this.codH = hotel.getCodH(); // Obtener el código del hotel
@@ -41,19 +41,25 @@ public class ReservasH {
 	}
 
     // Método getter para el atributo cliente
-    public Clientes getCliente() {
+    public Clientes getClientes() {
         return clientes;
+    }
+    public void setClientes(Clientes cliente) {
+    	
     }
  // Método getter para el atributo socio
     public Socios getSocios() {
         return socios;
+    }
+    public void setSocios(Socios socio) {
+    	
     }
 
     // Método getter para el atributo dni
     //public void getDni(String dni) {
      //   this.dni = dni;
     //}
-    public void setCodH(String codH) {
+    public void setCodH(Hoteles nuevoHotelElegido) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -70,13 +76,23 @@ public class ReservasH {
 
     
 
-	public static List<ReservasH> getReservash() {
+	public static List<ReservasH> getReservasH() {
 		return reservash;
 	}
 
-	public static void setReservasv(List<ReservasH> reservash) {
-		ReservasH.reservash = reservash;
+	public void setReservasH(List<ReservasH> reservash) {
+	    this.reservash = reservash;
 	}
+	public void setHoteles(Hoteles nuevoHotelElegido) {
+	    this.hoteles = nuevoHotelElegido;
+	}
+	public void eliminarReservaH(ReservasH reserva) {
+	    this.reservash.remove(reserva);
+	    reserva.setClientes(null);
+	    reserva.setSocios(null);
+	    reserva.setCodH(null);
+	}
+
 	
 }
 

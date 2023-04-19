@@ -90,6 +90,16 @@ public class Socios extends Personas {
     public void agregarReserva(ReservasV reservasv) {
         reservasV.add(reservasv);
     }
+
+	public void eliminarReservaH(ReservasH hotelCancelar) {
+	    reservasH.remove(reservasH);
+	}
+	public void eliminarReservaV(ReservasV vueloCancelar) {
+		    reservasV.remove(reservasV);
+			
+				
+	}
+
 }
 
 
