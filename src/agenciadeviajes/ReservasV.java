@@ -32,6 +32,10 @@ public class ReservasV {
 		// TODO Auto-generated constructor stub
 	}*/
 
+	public ReservasV() {
+		// TODO Auto-generated constructor stub
+	}
+
 	public static int getNumRV() {
 		return numRV;
 	}

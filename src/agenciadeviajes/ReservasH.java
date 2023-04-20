@@ -27,6 +27,10 @@ public class ReservasH {
         //this.codH = hotel.getCodH(); // Obtener el código del hotel
     }
 
+	public ReservasH() {
+		// TODO Auto-generated constructor stub
+	}
+
 	// Método getter para el atributo numRH
     public static int getNumRH() {
         return numRH;
@@ -59,6 +63,18 @@ public class ReservasH {
     //public void getDni(String dni) {
      //   this.dni = dni;
     //}
+    public Hoteles getHoteles() {
+    	return hoteles;
+    }
+    public void setHoteles(String codH, List<Hoteles> listaHoteles) {
+        // buscar el objeto Hoteles correspondiente a codH en la listaHoteles
+        for (Hoteles h : listaHoteles) {
+            if (h.getCodH().equals(codH)) {
+                this.hoteles = h;
+                break;
+            }
+        }
+    }
     public void setCodH(Hoteles nuevoHotelElegido) {
 		// TODO Auto-generated method stub
 		
