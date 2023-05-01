@@ -3,6 +3,10 @@ package agenciadeviajes;
 import java.time.LocalDate;
 
 public class Vuelos {
+	/**
+
+	La clase Hoteles representa un vuelo y sus características, incluyendo su código, aerolinea, origen, destino, precio, fecha de salida y fecha de llegada
+	*/
     private String codV;
     private String aerolinea;
     private String clase;
@@ -12,28 +16,38 @@ public class Vuelos {
     private LocalDate fechaSalida;
     private LocalDate fechaLlegada;
     
-    //private ArrayList<Vuelos> listaV = new ArrayList<Vuelos>();
-    
-    /*public Vuelos(ArrayList<Vuelos> listaV) {
-    	 this.listaV = new ArrayList<Vuelos>();        // Agregar los hoteles a la lista aquí
-    }*/
-    
-    /*public void fillDataV() {
-    	listaV.add(new Vuelos ("V1", "AVIANCA", "TURISTA", "ESPAÑA", "COLOMBIA", 600.00, null, null));
-    	listaV.add(new Vuelos ("V2", "LATAM", "TURISTA", "ESPAÑA", "ARGENTINA", 650.00, null, null));
-    	listaV.add(new Vuelos ("V3", "AIRLINE", "PRIMERA CLASE", "ESPAÑA", "PANAMA", 200.00, null, null));
-       
-        }*/
+    public Vuelos() {
+   	 	this.codV = "";
+        this.aerolinea = "";
+        this.origen = "";
+        this.destino = "";
+        this.clase = "";
+        this.precio = 0;
+        this.fechaSalida = null;
+        this.fechaLlegada = null;
+   }
 
-    public Vuelos(String codV, String aerolinea, String clase, String origen, String destino, double precio, LocalDate fechaSalida, LocalDate fechaLlegada) {
+	public Vuelos(Vuelos v) {
+		this.codV = v.codV;
+		this.aerolinea = v.aerolinea;
+		this.origen = v.origen;
+		this.destino = v.destino;
+		this.clase = v.clase;
+		this.precio = v.precio;
+		this.fechaSalida = v.fechaSalida;
+		this.fechaLlegada = v.fechaLlegada;
+	}
+    
+
+    public Vuelos(String codV, String aerolinea, String origen, String destino, String clase, double precio, LocalDate fechaSalida, LocalDate fechaLlegada) {
         this.codV = codV;
-        this.aerolinea = aerolinea;
-        this.clase = clase;
+        this.aerolinea = aerolinea;    
         this.origen = origen;
         this.destino = destino;
+        this.clase = clase;
         this.precio = precio;
-        this.fechaSalida = LocalDate.now();
-        this.fechaLlegada = LocalDate.now();
+        this.fechaSalida = fechaSalida;
+        this.fechaLlegada = fechaLlegada;
     }
 
 	public String getCodV() {
@@ -106,6 +120,6 @@ public class Vuelos {
 				+ ", destino=" + destino + ", precio=" + precio + ", fechaSalida=" + fechaSalida + ", fechaLlegada="
 				+ fechaLlegada + "]";
 	}
-
+	
 }
 

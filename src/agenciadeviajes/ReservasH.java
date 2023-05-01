@@ -1,123 +1,88 @@
 package agenciadeviajes;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Scanner;
 
-public class ReservasH {
+public class ReservasH implements DescuentoSocio{
+	/**
+
+	La clase ReservasH representa una reserva de hotel realizada por un usuario,
+	la cual contiene información sobre el usuario, el hotel, el número de reserva y la fecha de la reserva.
+	También implementa la interfaz DescuentoSocio para aplicar descuentos a las reservas realizadas por los socios.
+	*/
 	
-    private static int numRH = 0; // Inicializar numRH a 0
+    private String dni;
+    private String codH;
+    private int numRH;
     private LocalDate fechaRH;
-    //private String dni;
-    //private String codH;
-    private Clientes clientes; // Cambiar a Cliente en lugar de ArrayList<Cliente>
-    private Socios socios; // Cambiar a Socio en lugar de ArrayList<Socio>
-    private Hoteles hoteles; // Cambiar a Hotel en lugar de ArrayList<Hotel>
-
-    private static List<ReservasH> reservash = new ArrayList<>();
+    
+    public ReservasH() {
+    	this.dni = "";
+        this.codH = "";
+        this.numRH= 0;
+        this.fechaRH = null;
+   	}
 
     // Constructor que recibe los parámetros necesarios para crear una reserva
-    public ReservasH(Clientes cliente, Socios socio, Hoteles hotel) {
-        this.clientes = cliente;
-        this.socios = socio;
-        this.hoteles = hotel;
-        ReservasH.numRH = (int) (Math.random() * 1000) + 1; // Generar un número aleatorio entre 1 y 1000
-        this.fechaRH = LocalDate.now();
-        //this.dni = cliente.getDni(); // Obtener el DNI del cliente
-        //this.codH = hotel.getCodH(); // Obtener el código del hotel
-    }
-
-	public ReservasH() {
-		// TODO Auto-generated constructor stub
-	}
-
-	// Método getter para el atributo numRH
-    public static int getNumRH() {
-        return numRH;
-    }
-
-    // Método getter para el atributo fechaRH
-    public LocalDate getFechaRH() {
-        return fechaRH;
+    public ReservasH(String dni,  String codH, int numRH, LocalDate fechaRH) {
+        this.dni = dni;
+        this.codH = codH;
+        this.numRH= numRH;
+        this.fechaRH = fechaRH;
     }
     
-    public void setFechaRH(LocalDate now) {		
+	public String getDni() {
+        return dni;
+    }
+
+    public void setDni(String dni) {
+        this.dni = dni;
+    }
+    
+    public String getCodH() {
+		return codH;
 	}
 
-    // Método getter para el atributo cliente
-    public Clientes getClientes() {
-        return clientes;
-    }
-    public void setClientes(Clientes cliente) {
-    	
-    }
- // Método getter para el atributo socio
-    public Socios getSocios() {
-        return socios;
-    }
-    public void setSocios(Socios socio) {
-    	
-    }
+	public void setCodH(String codH) {
+		this.codH = codH;
+	}
 
-    // Método getter para el atributo dni
-    //public void getDni(String dni) {
-     //   this.dni = dni;
-    //}
-    public Hoteles getHoteles() {
-    	return hoteles;
+    public void setNumRH(int numRH) {
+        this.numRH = numRH;
     }
-    public void setHoteles(String codH, List<Hoteles> listaHoteles) {
-        // buscar el objeto Hoteles correspondiente a codH en la listaHoteles
-        for (Hoteles h : listaHoteles) {
-            if (h.getCodH().equals(codH)) {
-                this.hoteles = h;
-                break;
-            }
-        }
-    }
-    public void setCodH(Hoteles nuevoHotelElegido) {
-		// TODO Auto-generated method stub
+	public int getNumRH() {
+		return numRH;
+	}
+
+	public LocalDate getFechaRH() {
+		return fechaRH;
+	}
+
+	public void setFechaRH(LocalDate fechaRH) {
+		this.fechaRH = fechaRH;
+	}
+
+	@Override
+	public String toString() {
+		return "ReservasH [dni=" + dni + ", codH=" + codH + ", numRH=" + numRH + ", fechaRH=" + fechaRH + "]";
+	}
+	
+	public void print() {
+		
+		System.out.println("---Datos ReservaH---");
+		System.out.println("Dni usuario:" + this.dni);
+		System.out.println("Código del Hotel :" + this.codH);
+		System.out.println("Número de reserva Hotel: " +this.numRH);
+		System.out.println("Fecha de Reserva Hotel: " +this.fechaRH);
 		
 	}
-    @Override
-    public String toString() {
-        String dni = "";
-        if (clientes instanceof Clientes) {
-            dni = ((Clientes) clientes).getDni();
-        } else if (socios instanceof Socios) {
-            dni = ((Socios) socios).getDni();
-        }
-        return "Reserva [numRH=" + numRH + ", fechaRH=" + fechaRH + ", dni=" + dni + ", codH=" + hoteles.getCodH() + "]";
-    }
 
-    
-
-	public static List<ReservasH> getReservasH() {
-		return reservash;
+	@Override
+	public double aplicarDescuento(double precio) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
-
-	public void setReservasH(List<ReservasH> reservash) {
-	    this.reservash = reservash;
-	}
-	public void setHoteles(Hoteles nuevoHotelElegido) {
-	    this.hoteles = nuevoHotelElegido;
-	}
-	public void eliminarReservaH(ReservasH reserva) {
-	    this.reservash.remove(reserva);
-	    reserva.setClientes(null);
-	    reserva.setSocios(null);
-	    reserva.setCodH(null);
-	}
-
 	
 }
 
-    // Método getter para el atributo codH
-//    public String getCodH() {
- //       return codH;
-  //  }
-
-
-
-   
 

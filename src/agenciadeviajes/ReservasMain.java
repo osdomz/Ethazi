@@ -1,658 +1,744 @@
 package agenciadeviajes;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
-import java.util.List;
+import javax.swing.JOptionPane;
+import java.time.LocalDate;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 public class ReservasMain {
+	/**
+	 * La clase ReservasMain es la clase principal que maneja el sistema de reservas
+	 * de hoteles y vuelos para clientes y socios.
+	 */
+
+	private static final Logger LOGGER = Logger.getLogger(ReservasMain.class.getName());
+	private static FileHandler fileHandler = null;
+
+	public static void configurarLogger() {
+		try {
+			fileHandler = new FileHandler("registro_errores.log");
+			LOGGER.addHandler(fileHandler);
+			SimpleFormatter formatter = new SimpleFormatter();
+			fileHandler.setFormatter(formatter);
+			LOGGER.setLevel(Level.ALL);
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE, "Error al crear el archivo de registro", e);
+		}
+	}
 
 	public static void main(String[] args) {
-
-		ArrayList<Clientes> listaClientes = new ArrayList<Clientes>();
-		Clientes cliente1 = new Clientes("0ABCDEF01", "CHRISTIAN", "OSPINA", "DOMINGUEZ", 25, "631726686","C_OSPINA@FPZORNOTZA.COM", 101);
-		Clientes cliente2 = new Clientes("0ABCDEF04", "MARIA", "MARTINEZ", "GOMEZ", 32, "631726687","M_MARTINEZ@FPZORNOTZA.COM", 202);
-		Clientes cliente3 = new Clientes("0ABCDEF05", "ANDRES", "RODRIGUEZ", "SUAREZ", 27, "631726688","A_RODRIGUEZ@FPZORNOTZA.COM", 303);
-		listaClientes.add(cliente1);
-		listaClientes.add(cliente2);
-		listaClientes.add(cliente3);
-
-		ArrayList<Socios> listaSocios = new ArrayList<Socios>();
-		Socios socio1 = new Socios("12345678D", "CHRISTIAN", "OSPINA", "DOMINGUEZ", 21, "631726686","C_OSPINA@FPZORNOTZA.COM", 404);
-		Socios socio2 = new Socios("12345678E", "BITTOR", "OSPINA", "DOMINGUEZ", 21, "631726686","C_OSPINA@FPZORNOTZA.COM", 505);
-		Socios socio3 = new Socios("12345678F", "ARKA", "OSPINA", "DOMINGUEZ", 21, "631726686","C_OSPINA@FPZORNOTZA.COM", 606);
-		listaSocios.add(socio1);
-		listaSocios.add(socio2);
-		listaSocios.add(socio3);
-
-		ArrayList<Hoteles> listaHoteles = new ArrayList<Hoteles>();
-		Hoteles hotel1 = new Hoteles("H1", "HOTEL DIAMANTE", "AV.3N", "CLASSIC", 3, "24H", 50.00);
-		Hoteles hotel2 = new Hoteles("H2", "HOTEL DULCES SUEÑOS", "AV.3N", "GOLD", 4, "24H", 70.00);
-		Hoteles hotel3 = new Hoteles("H3", "HOTEL CALIFORNIA", "AV.3N", "PLATINUM", 5, "24H", 100.00);
-		listaHoteles.add(hotel1);
-		listaHoteles.add(hotel2);
-		listaHoteles.add(hotel3);
-
-		ArrayList<Vuelos> listaVuelos = new ArrayList<Vuelos>();
-		Vuelos vuelo1 = new Vuelos("V1", "AVIANCA", "TURISTA", "ESPAÑA", "COLOMBIA", 600.00, null, null);
-		Vuelos vuelo2 = new Vuelos("V2", "LATAM", "TURISTA", "ESPAÑA", "ARGENTINA", 650.00, null, null);
-		Vuelos vuelo3 = new Vuelos("V3", "AIRLINE", "PRIMERA CLASE", "ESPAÑA", "PANAMA", 200.00, null, null);
-		listaVuelos.add(vuelo1);
-		listaVuelos.add(vuelo2);
-		listaVuelos.add(vuelo3);
-
-		ArrayList<ReservasH> listaReservasH = new ArrayList<ReservasH>();
-		ReservasH rhbd = new ReservasH();
-
-		ArrayList<ReservasV> listaReservasV = new ArrayList<ReservasV>();
-		ReservasV rvbd = new ReservasV();
+		configurarLogger();
 
 		try {
-		    Connection conexion = DriverManager.getConnection("jdbc:mysql://localhost/agencia_de_viajes", "root", "");
-		    System.out.println("Conexión Correcta.");
-		    Statement st = conexion.createStatement();
-		    
-		    ResultSet rs = st.executeQuery("SELECT * FROM agencia_de_viajes.reservash;");
-		    while (rs.next()) {
-		        int numRH = rs.getInt("numRH");
-		        String dni = rs.getString("dni");
-		        String codH = rs.getString("codH");
-		        LocalDate fechaRH = rs.getObject("fechaRH", LocalDate.class);
-		        ReservasH reservasH = new ReservasH();
-		        listaReservasH.add(reservasH);
-		    }
+			ArrayList<Clientes> aClientes = new ArrayList<Clientes>();
 
-		    rs = st.executeQuery("SELECT * FROM agencia_de_viajes.reservasv;");
-		    while (rs.next()) {
-		        int numRV = rs.getInt("numRV");
-		        String dni = rs.getString("dni");
-		        String codV = rs.getString("codV");
-		        LocalDate fechaRV = rs.getObject("fechaRV", LocalDate.class);
-		        ReservasV reservasV = new ReservasV();
-		        listaReservasV.add(reservasV);
-		    }
-		    
-		    // cierro el resultset
-		    rs.close();
-		    // cierro el statement despues de realizar la consulta
-		    st.close();
-		    // cierro la conexion
-		    conexion.close();
-		    
-		    // Realizar acciones con las listas de reservas obtenidas
-		    
-		} catch (SQLException e) {
-		    // si no se ha conectado correctamente
-		    System.out.println("Error de conexión");
-		    e.printStackTrace();
-		}
+			ArrayList<Socios> aSocios = new ArrayList<Socios>();
 
-		try (Scanner scanner = new Scanner(System.in)) {
-			String dni = null;
-			String tipoUsuario = null;
-			boolean usuarioEncontrado = false;
-			
-			boolean modificadoh = false;
-			boolean modificadov = false;
-			boolean canceladoh = false;
-			boolean canceladov = false;
-			int posicion;
+			ArrayList<Hoteles> aHoteles = new ArrayList<Hoteles>();
 
-			// Solicitar al usuario que ingrese su DNI hasta que se ingrese un valor válido
+			ArrayList<Vuelos> aVuelos = new ArrayList<Vuelos>();
+
+			ArrayList<ReservasH> aReservasH = new ArrayList<ReservasH>();
+
+			ArrayList<ReservasV> aReservasV = new ArrayList<ReservasV>();
+
+			FileInputStream fis;
+			ObjectInputStream ois;
+			try {
+				fis = new FileInputStream("socios.dat");
+				ois = new ObjectInputStream(fis);
+
+				ois.close();
+				fis.close();
+				System.out.println("Conexión con fichero correcta");
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} /**
+				 * Este método se utiliza para leer los datos de los socios desde un archivo de
+				 * datos llamado "socios.dat" y cargarlos en la lista de socios. El archivo de
+				 * datos debe existir previamente en el directorio del proyecto.
+				 */
+
+			boolean agregadorh = false;
+			boolean agregadorv = false;
+			boolean modificadorh = false;
+			boolean modificadorv = false;
+			boolean eliminadorh = false;
+			boolean eliminadorv = false;
+			int opcion = 0;
+
+			try {
+
+				ResultSet rs;
+				Connection conexion = DriverManager.getConnection("jdbc:mysql://localhost/agencia_de_viajes", "root",
+						"");
+				JOptionPane.showMessageDialog(null, "Conexión Correcta.", "Aviso", JOptionPane.INFORMATION_MESSAGE);
+				Statement st = conexion.createStatement();
+
+				// Consultar los datos de los clientes en la base de datos y añadirlos al
+				// ArrayList correspondiente
+				rs = st.executeQuery(
+						"SELECT personas.*, clientes.numCliente FROM personas JOIN clientes ON personas.dni = clientes.dni");
+				while (rs.next()) {
+					String dni = rs.getString("dni");
+					String nombre = rs.getString("nombre");
+					String apellido1 = rs.getString("apellido1");
+					String apellido2 = rs.getString("apellido2");
+					int edad = rs.getInt("edad");
+					String telefono = rs.getString("telefono");
+					String email = rs.getString("email");
+					int numCliente = rs.getInt("numCliente");
+
+					// Crear objeto Cliente con la información obtenida
+					Clientes cliente = new Clientes(dni, nombre, apellido1, apellido2, edad, telefono, email,
+							numCliente);
+
+					// Agregar el cliente a la lista
+					aClientes.add(cliente);
+				}
+				// Consultar los datos de los socios en la base de datos y añadirlos al
+				// ArrayList correspondiente
+
+				rs = st.executeQuery(
+						"SELECT personas.*, socios.numSocio FROM personas JOIN socios ON personas.dni = socios.dni");
+				while (rs.next()) {
+					String dni = rs.getString("dni");
+					String nombre = rs.getString("nombre");
+					String apellido1 = rs.getString("apellido1");
+					String apellido2 = rs.getString("apellido2");
+					int edad = rs.getInt("edad");
+					String telefono = rs.getString("telefono");
+					String email = rs.getString("email");
+					int numSocio = rs.getInt("numSocio");
+
+					// Crear objeto Cliente con la información obtenida
+					Socios socio = new Socios(dni, nombre, apellido1, apellido2, edad, telefono, email, numSocio);
+
+					// Agregar el cliente a la lista
+					aSocios.add(socio);
+				}
+				// Consultar los datos de los hoteles en la base de datos y añadirlos al
+				// ArrayList correspondiente
+
+				rs = st.executeQuery("SELECT * FROM agencia_de_viajes.hoteles;");
+				while (rs.next()) {
+					aHoteles.add(new Hoteles(rs.getString("codH"), rs.getString("nombre"), rs.getString("direccion"),
+							rs.getInt("numEstrellas"), rs.getString("tiempo"), rs.getDouble("precio")));
+				}
+				// Consultar los datos de los vuelos en la base de datos y añadirlos al
+				// ArrayList correspondiente
+
+				rs = st.executeQuery("SELECT * FROM agencia_de_viajes.vuelos;");
+				while (rs.next()) {
+					LocalDate fechaSalida = rs.getDate("fechaSalida").toLocalDate();
+					LocalDate fechaLlegada = rs.getDate("fechaLlegada").toLocalDate();
+					aVuelos.add(new Vuelos(rs.getString("codV"), rs.getString("aerolinea"), rs.getString("origen"),
+							rs.getString("destino"), rs.getString("clase"), rs.getDouble("precio"), fechaSalida,
+							fechaLlegada));
+				}
+				// Consultar los datos de las reservas de los hoteles en la base de datos y
+				// añadirlos al ArrayList correspondiente
+
+				rs = st.executeQuery("SELECT * FROM agencia_de_viajes.reservash;");
+				while (rs.next()) {
+					aReservasH.add(new ReservasH(rs.getString("dni"), rs.getString("codH"), rs.getInt("numRH"),
+							rs.getDate("fechaRH").toLocalDate()));
+				}
+				// Consultar los datos de las reservas de vuelos en la base de datos y añadirlos
+				// al ArrayList correspondiente
+
+				rs = st.executeQuery("SELECT * FROM agencia_de_viajes.reservasv;");
+				while (rs.next()) {
+					aReservasV.add(new ReservasV(rs.getString("dni"), rs.getString("codV"), rs.getInt("numRV"),
+							rs.getDate("fechaRV").toLocalDate()));
+				}
+
+				// cierro el resultset
+				rs.close();
+				// cierro el statement despues de realizar la consulta
+				st.close();
+				// cierro la conexion
+			} catch (SQLException e) {
+				// si no se ha conectado correctamente
+				System.out.println("Error de conexión");
+				throw new RuntimeException(
+						" ===== No se pudo establecer la conexión con la base de datos. Acceso a la aplicación denegado. ===== ");
+				// e.printStackTrace();
+			} /**
+				 * Método que establece la conexión con la base de datos y carga los datos en
+				 * los ArrayList correspondientes.
+				 * 
+				 * @throws RuntimeException si no se puede establecer la conexión con la base de
+				 *                          datos.
+				 */
+
+			String nuevoCodH = null;
+			int numRH = 0;
+			String nuevoCodV = null;
+			int numRV = 0;
+			/**
+			 * Método principal que solicita el DNI del usuario, busca si corresponde a un
+			 * cliente o a un socio, y muestra un mensaje de bienvenida o lanza una
+			 * excepción en caso de que no se encuentre el DNI.
+			 * 
+			 * @param args los argumentos de la línea de comandos (no se utilizan en este
+			 *             programa)
+			 * @throws IllegalArgumentException si el DNI ingresado no es válido o si no se
+			 *                                  encontró ningún cliente ni socio con ese
+			 *                                  DNI.
+			 */
+
+			Scanner scanner = new Scanner(System.in);
+			// Crea un cuadro de diálogo para ingresar el DNI
+			String dniIngresado = "";
+			while (true) {
+				dniIngresado = JOptionPane.showInputDialog(null, "Ingrese su DNI:", "Login", JOptionPane.PLAIN_MESSAGE);
+				dniIngresado = dniIngresado != null ? dniIngresado.toUpperCase() : ""; // Maneja el caso en que se
+																						// presiona "Cancelar"
+
+				try {
+					if (!dniIngresado.matches("[0-9]{8}[A-Z]")) {
+						throw new IllegalArgumentException(
+								"El DNI ingresado no es válido. Por favor, ingrese un DNI válido.");
+					}
+					break;
+				} catch (IllegalArgumentException e) {
+					JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+
+			// Busca el DNI en la lista de clientes y socios
+			boolean esCliente = false;
+			boolean esSocio = false;
+			String nombre = "";
+
+			for (Clientes cliente : aClientes) {
+				if (cliente.getDni().equals(dniIngresado)) {
+					esCliente = true;
+					nombre = cliente.getNombre();
+					break;
+				}
+			}
+
+			if (!esCliente) {
+				for (Socios socio : aSocios) {
+					if (socio.getDni().equals(dniIngresado)) {
+						esSocio = true;
+						nombre = socio.getNombre();
+						break;
+					}
+				}
+			}
+
+			// Muestra el mensaje de bienvenida o error
+			if (esCliente) {
+				JOptionPane.showMessageDialog(null, "Bienvenido Cliente " + nombre, "Bienvenida",
+						JOptionPane.INFORMATION_MESSAGE);
+			} else if (esSocio) {
+				JOptionPane.showMessageDialog(null, "Bienvenido Socio " + nombre, "Bienvenida",
+						JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				throw new IllegalArgumentException("Lo siento, no se encontró ningún cliente ni socio con ese DNI.");
+				
+			}LOGGER.info("LOGGER PRUEBA ERRORES");
+
 			do {
 				try {
-					System.out.print("Ingrese su DNI para ingresar al menú: ");
-					String input = scanner.nextLine();
-					if (!input.matches("[0-9]+[A-Z]")) {
-						throw new IllegalArgumentException();
-					}
-					dni = input.toUpperCase();
-					tipoUsuario = verificarDni(dni, listaClientes, listaSocios);
-					if (tipoUsuario == null) {
-						System.out.println("DNI no encontrado, por favor intente de nuevo");
-					} else {
-						usuarioEncontrado = true;
-					}
-				} catch (IllegalArgumentException e) {
-					System.out.println("Error: Debe ingresar su DNI con la letra en mayúscula y sin espacios.");
-				}
-			} while (!usuarioEncontrado);
+					System.out.println("\nSeleccione una opción:");
+					System.out.println("1. Mostrar Hoteles disponibles");
+					System.out.println("2. Mostrar Vuelos disponibles");
+					System.out.println("3. Consultar reserva Hotel");
+					System.out.println("4. Consultar reserva Vuelo");
+					System.out.println("5. Modificar reserva de Hotel");
+					System.out.println("6. Modificar reserva de Vuelo");
+					System.out.println("7. Anular reserva de Hotel");
+					System.out.println("8. Anular reserva de Vuelos");
+					System.out.println("9. Salir");
 
-			// Variable para almacenar el DNI verificado
-			String dniVerificado = dni;
+					opcion = scanner.nextInt();
 
-			System.out.println("Bienvenido al menú de reservas, " + tipoUsuario + " "
-					+ obtenerNombreUsuario(tipoUsuario, dniVerificado, listaClientes, listaSocios));
-
-			int opcion;
-
-			do {
-				System.out.println("\nSeleccione una opción:");
-				System.out.println("1. Mostrar Hoteles disponibles");
-				System.out.println("2. Mostrar Vuelos disponibles");
-				System.out.println("3. Consultar reserva");
-				System.out.println("4. Modificar reserva de Hotel");
-				System.out.println("5. Modificar reserva de Vuelo");
-				System.out.println("6. Anular reserva de Hotel");
-				System.out.println("7. Anular reserva de Vuelos");
-				System.out.println("8. Salir");
-
-				opcion = scanner.nextInt();
-				scanner.nextLine();
-
-				switch (opcion) {
-
-				case 1:
-					// Mostrar la lista de hoteles disponibles
-					System.out.println("Lista de hoteles disponibles:");
-					for (Hoteles h : listaHoteles) {
-						System.out.println(h);
-					}
-
-					// Solicitar al usuario que ingrese el código del hotel elegido
-					System.out.print("Ingrese el código del hotel elegido: ");
-					String codigoHotel = scanner.nextLine();
-
-					// Verificar que el código de hotel ingresado es válido
-					Hoteles hotelElegido = null;
-					for (Hoteles h : listaHoteles) {
-						if (h.getCodH() != null && h.getCodH().equals(codigoHotel)) {
-							hotelElegido = h;
-							break;
-						}
-					}
-					if (hotelElegido == null) {
-						System.out.println("Código de hotel inválido.");
-						break;
-					}
-
-					// Obtener el objeto Cliente o Socio correspondiente al DNI del usuario
-					Clientes clienteElegido = null;
-					Socios socioElegido = null;
-					for (Clientes c : listaClientes) {
-						if (c.getDni().equals(dni)) {
-							clienteElegido = c;
-							System.out.println("Cliente encontrado: " + clienteElegido);
-							break;
-						}
-					}
-					for (Socios s : listaSocios) {
-						if (s.getDni().equals(dniVerificado)) {
-							socioElegido = s;
-							break;
-						}
-					}
-					if (clienteElegido == null && socioElegido == null) {
-						System.out.println("DNI de usuario no encontrado.");
-						break;
-					}
-
-					// Crear una nueva reserva de hotel y agregarla a la lista de reservas de
-					// hoteles
-					if (clienteElegido != null || socioElegido != null) {
-						ReservasH nuevaReservaH = new ReservasH(clienteElegido, socioElegido, hotelElegido);
-						nuevaReservaH.setFechaRH(LocalDate.now()); // Asignar la fecha actual como fecha de reserva
-						((List<ReservasH>) listaReservasH).add(nuevaReservaH);
-
-						// Agregar la reserva al objeto Cliente o Socio correspondiente
-						if (clienteElegido != null) {
-							clienteElegido.agregarReserva(nuevaReservaH);
-						} else {
-							socioElegido.agregarReserva(nuevaReservaH);
-						}
-
-						System.out.println("Reserva de hotel creada satisfactoriamente.");
-						System.out.println("Número de reserva generado: " + ReservasH.getNumRH());
-					} else {
-						System.out.println(
-								"No se pudo crear la reserva, no se encontró el cliente o socio correspondiente al DNI ingresado.");
-					}
-					break;
-				case 2:
-					// Mostrar la lista de vuelos disponibles
-					System.out.println("Lista de vuelos disponibles:");
-					for (Vuelos v : listaVuelos) {
-						System.out.println(v);
-					}
-
-					// Solicitar al usuario que ingrese el código del vuelo elegido
-					System.out.print("Ingrese el código del vuelo elegido: ");
-					String codigoVuelo = scanner.nextLine();
-
-					// Verificar que el código de vuelo ingresado es válido
-					Vuelos vueloElegido = null;
-					for (Vuelos v : listaVuelos) {
-						if (v.getCodV() != null && v.getCodV().equals(codigoVuelo)) {
-							vueloElegido = v;
-							break;
-						}
-					}
-					if (vueloElegido == null) {
-						System.out.println("Código de vuelo inválido.");
-						break;
-					}
-
-					// Obtener el objeto Cliente o Socio correspondiente al DNI del usuario
-					Clientes clienteElegido2 = null;
-					Socios socioElegido2 = null;
-					for (Clientes c : listaClientes) {
-						if (c.getDni().equals(dni)) {
-							clienteElegido2 = c;
-							System.out.println("Cliente encontrado: " + clienteElegido2);
-							break;
-						}
-					}
-					for (Socios s : listaSocios) {
-						if (s.getDni().equals(dniVerificado)) {
-							socioElegido2 = s;
-							System.out.println("Cliente encontrado: " + socioElegido2);
-							break;
-						}
-					}
-
-					if (clienteElegido2 == null && socioElegido2 == null) {
-						System.out.println("DNI de usuario no encontrado.");
-						break;
-					}
-
-					// Crear una nueva reserva de vuelos y agregarla a la lista de reservas de
-					// vuelos
-					if (clienteElegido2 != null || socioElegido2 != null) {
-						ReservasV nuevaReservaV = new ReservasV(clienteElegido2, socioElegido2, vueloElegido);
-						nuevaReservaV.setFechaRV(LocalDate.now()); // Asignar la fecha actual como fecha de reserva
-						((List<ReservasV>) listaReservasV).add(nuevaReservaV);
-
-						// Agregar la reserva al objeto Cliente o Socio correspondiente
-						if (clienteElegido2 != null) {
-							clienteElegido2.agregarReserva(nuevaReservaV);
-						} else {
-							socioElegido2.agregarReserva(nuevaReservaV);
-						}
-
-						System.out.println("Reserva de Vuelo creada satisfactoriamente.");
-						System.out.println("Número de reserva generado: " + ReservasV.getNumRV());
-					} else {
-						System.out.println(
-								"No se pudo crear la reserva, no se encontró el cliente o socio correspondiente al DNI ingresado.");
-					}
-					break;
-
-				case 3:
-					// Solicitar al usuario que ingrese el número de reserva
-					System.out.print("Ingrese el número de reserva: ");
-					int numReserva = scanner.nextInt();
 					scanner.nextLine();
 
-					// Buscar la reserva correspondiente al número ingresado en la lista de reservas
-					// de vuelos
-					ReservasV vueloEncontrado = null;
-					for (ReservasV r : listaReservasV) {
-						if (r.getNumRV() == numReserva) {
-							vueloEncontrado = r;
-							break;
-						}
-					}
+					switch (opcion) {
 
-					// Buscar la reserva correspondiente al número ingresado en la lista de reservas
-					// de hoteles
-					ReservasH hotelEncontrado = null;
-					for (ReservasH r : listaReservasH) {
-						if (r.getNumRH() == numReserva) {
-							hotelEncontrado = r;
-							break;
-						}
-					}
+					case 1:
+						do {
+							// Mostrar lista de hoteles
+							System.out.println("Lista de hoteles:");
+							for (Hoteles hotel : aHoteles) {
+								System.out.println(hotel.getCodH() + ". Nombre: " + hotel.getNombre() + ". Dirección: "
+										+ hotel.getDireccion() + ". Estrellas: " + hotel.getNumEstrellas()
+										+ ". Precio: - " + hotel.getPrecio());
+							}
 
-					// Si se encontró una reserva en la lista de reservas de vuelos, mostrar la
-					// información correspondiente
-					if (vueloEncontrado != null) {
-						System.out.println("Reserva de vuelo encontrada:");
-						System.out.println(vueloEncontrado);
-					}
-					// Si se encontró una reserva en la lista de reservas de hoteles, mostrar la
-					// información correspondiente
-					else if (hotelEncontrado != null) {
-						System.out.println("Reserva de hotel encontrada:");
-						System.out.println(hotelEncontrado);
-					}
-					// Si no se encontró una reserva en ninguna de las listas, mostrar un mensaje de
-					// error
-					else {
-						System.out.println("Reserva no encontrada.");
-					}
-					break;
+							// Pedir código de hotel a reservar o volver al menú
+							System.out.println(
+									"Ingrese el código del hotel que desea reservar o escriba el número '0' para volver al menú: ");
+							String codH = scanner.nextLine();
 
-				case 4:
-					// Mostrar la lista de reservas del usuario
-					System.out.println("Lista de reservas de Hoteles:");
-					for (ReservasH rh : listaReservasH) {
-						if (rh.getClientes() != null && rh.getClientes().getDni().equals(dni)
-								|| rh.getSocios() != null && rh.getSocios().getDni().equals(dniVerificado)) {
-							System.out.println(rh);
-						}
-					}
+							// Si el usuario eligió volver al menú, salir del bucle
+							if (codH.equals("0")) {
+								break;
+							}
 
-					// Solicitar al usuario que ingrese el número de reserva a modificar
-					System.out.print("Ingrese el número de reserva a modificar: ");
-					int numRH = scanner.nextInt();
-					scanner.nextLine();
+							// Buscar hotel en la lista de hoteles
+							Hoteles hotelSeleccionado = null;
+							for (Hoteles hotel : aHoteles) {
+								if (hotel.getCodH().equals(codH)) {
+									hotelSeleccionado = hotel;
+									break;
+								}
+							}
 
-					// Buscar la reserva correspondiente al número ingresado
-					ReservasH reservaModificar = null;
-					for (ReservasH rh : listaReservasH) {
-						if (rh.getNumRH() == numRH) {
-							reservaModificar = rh;
-							break;
-						}
-					}
+							// Verificar si el hotel fue encontrado
+							if (hotelSeleccionado == null) {
+								System.out
+										.println("==================================================================");
+								System.out.println("El código de hotel ingresado no es válido.");
+								System.out.println("Por favor introduzca un código de Hotel válido de la lista.");
+								System.out
+										.println("==================================================================");
+							} else {
+								// Obtener fecha actual
+								LocalDate fechaReservaH = LocalDate.now();
 
-					// Verificar que la reserva existe y pertenece al usuario
-					if (reservaModificar == null) {
-						System.out.println("Número de reserva inválido.");
+								// Crear nueva reserva sin proporcionar el argumento numRH
+								ReservasH nuevaReservaH = new ReservasH(dniIngresado, codH, aReservasH.size() + 1,
+										fechaReservaH);
+
+								// Agregar nueva reserva a la lista de reservas de hotel
+								aReservasH.add(nuevaReservaH);
+								agregadorh = true;
+
+								System.out.println("Reserva realizada con éxito.");
+
+								// Salir del bucle
+								break;
+							}
+						} while (true);
 						break;
-					} else if (reservaModificar.getClientes() != null
-							&& !reservaModificar.getClientes().getDni().equals(dni)
-							|| reservaModificar.getSocios() != null
-									&& !reservaModificar.getSocios().getDni().equals(dniVerificado)) {
-						System.out.println("La reserva no pertenece al usuario.");
-						break;
-					}
 
-					// Mostrar la lista de hoteles disponibles
-					System.out.println("Lista de hoteles disponibles:");
-					for (Hoteles h : listaHoteles) {
-						System.out.println(h);
-					}
+					case 2:
+						// Mostrar lista de Vuelos
+						System.out.println("Lista de Vuelos:");
+						for (Vuelos vuelo : aVuelos) {
+							System.out.println(vuelo.getCodV() + ". Aerolínea: " + vuelo.getAerolinea() + ". Origen: "
+									+ vuelo.getOrigen() + ". Destino " + vuelo.getDestino() + ". Clase: "
+									+ vuelo.getClase() + ". Precio: " + vuelo.getPrecio() + ". Fecha de Salida: "
+									+ vuelo.getFechaSalida() + ". Fecha de Llegada " + vuelo.getFechaLlegada());
+						}
 
-					// Solicitar al usuario que ingrese el código del nuevo hotel elegido
-					System.out.print("Ingrese el código del nuevo hotel elegido: ");
-					String codigoNuevoHotel = scanner.nextLine();
+						// Pedir código de hotel a reservar
+						System.out.print(
+								"Introduzca el código del vuelo que desea reservar o introduzca el número 0 para regresar al menú: ");
+						String codV = scanner.nextLine();
 
-					// Verificar que el código de hotel ingresado es válido
-					Hoteles nuevoHotelElegido = null;
-					for (Hoteles h : listaHoteles) {
-						if (h.getCodH() != null && h.getCodH().equals(codigoNuevoHotel)) {
-							nuevoHotelElegido = h;
+						// Si el usuario eligió volver al menú, salir del bucle
+						if (codV.equals("0")) {
 							break;
 						}
-					}
-					if (nuevoHotelElegido == null) {
-						System.out.println("Código de hotel inválido.");
-						break;
-					}
 
-					// Modificar la reserva con el nuevo hotel elegido
-					reservaModificar.setHoteles(nuevoHotelElegido);
-					System.out.println("Reserva modificada satisfactoriamente.");
-					modificadoh = true;
-
-					break;
-
-				case 5:
-					// Mostrar la lista de reservas del usuario
-					System.out.println("Lista de reservas de Vuelos:");
-					for (ReservasV rv : listaReservasV) {
-						if (rv.getClientes() != null && rv.getClientes().getDni().equals(dni)
-								|| rv.getSocios() != null && rv.getSocios().getDni().equals(dniVerificado)) {
-							System.out.println(rv);
-						}
-					}
-
-					// Solicitar al usuario que ingrese el número de reserva a modificar
-					System.out.print("Ingrese el número de reserva a modificar: ");
-					int numRV = scanner.nextInt();
-					scanner.nextLine();
-
-					// Buscar la reserva correspondiente al número ingresado
-					ReservasV reservaModificar2 = null;
-					for (ReservasV rv : listaReservasV) {
-						if (rv.getNumRV() == numRV) {
-							reservaModificar2 = rv;
-							break;
-						}
-					}
-
-					// Verificar que la reserva existe y pertenece al usuario
-					if (reservaModificar2 == null) {
-						System.out.println("Número de reserva inválido.");
-						break;
-					} else if (reservaModificar2.getClientes() != null
-							&& !reservaModificar2.getClientes().getDni().equals(dni)
-							|| reservaModificar2.getSocios() != null
-									&& !reservaModificar2.getSocios().getDni().equals(dniVerificado)) {
-						System.out.println("La reserva no pertenece al usuario.");
-						break;
-					}
-
-					// Mostrar la lista de hoteles disponibles
-					System.out.println("Lista de Vuelos disponibles:");
-					for (Vuelos v : listaVuelos) {
-						System.out.println(v);
-					}
-
-					// Solicitar al usuario que ingrese el código del nuevo hotel elegido
-					System.out.print("Ingrese el código del nuevo Vuelo elegido: ");
-					String codigoNuevoVuelo2 = scanner.nextLine();
-
-					// Verificar que el código de hotel ingresado es válido
-					Vuelos nuevoVueloElegido2 = null;
-					for (Vuelos v : listaVuelos) {
-						if (v.getCodV() != null && v.getCodV().equals(codigoNuevoVuelo2)) {
-							nuevoVueloElegido2 = v;
-							break;
-						}
-					}
-					if (nuevoVueloElegido2 == null) {
-						System.out.println("Código de vuelo inválido.");
-						break;
-					}
-
-					// Modificar la reserva con el nuevo hotel elegido
-					reservaModificar2.setVuelos(nuevoVueloElegido2);
-					System.out.println("Reserva modificada satisfactoriamente.");
-					modificadov = true;
-
-					break;
-
-				case 6:
-					System.out.print("Ingrese el número de reserva del Hotel a cancelar: ");
-					int numReservaCancelar = scanner.nextInt();
-					scanner.nextLine();
-
-					// Buscar la reserva correspondiente al número ingresado en la lista de reservas
-					// de hoteles
-					ReservasH hotelCancelar = null;
-					for (ReservasH r : listaReservasH) {
-						if (r.getNumRH() == numReservaCancelar) {
-							hotelCancelar = r;
-							break;
-						}
-					}
-
-					// Si se encontró la reserva en la lista de reservas de hoteles, cancelarla y
-					// eliminarla de la lista
-					if (hotelCancelar != null) {
-						// Obtener el objeto Cliente o Socio correspondiente al DNI del usuario
-						Clientes clienteCancelar = null;
-						Socios socioCancelar = null;
-						boolean esSocio = false;
-
-						for (Clientes c : listaClientes) {
-							if (c.getDni().equals(dni)) {
-								clienteCancelar = c;
-								System.out.println("Cliente encontrado: " + clienteCancelar);
+						// Buscar hotel en la lista de hoteles
+						Vuelos vueloSeleccionado = null;
+						for (Vuelos vuelo : aVuelos) {
+							if (vuelo.getCodV().equals(codV)) {
+								vueloSeleccionado = vuelo;
 								break;
 							}
 						}
 
-						if (clienteCancelar == null) {
-							for (Socios s : listaSocios) {
-								if (s.getDni().equals(dniVerificado)) {
-									socioCancelar = s;
-									System.out.println("Socio encontrado: " + socioCancelar);
-									esSocio = true;
-									break;
+						// Verificar si el hotel fue encontrado
+						if (vueloSeleccionado == null) {
+							System.out.println("==================================================================");
+							System.out.println("El código de vuelo ingresado no es válido.");
+							System.out.println("Por favor introduzca un código de Vuelo válido de la lista.");
+							System.out.println("==================================================================");
+						} else {
+							// Obtener fecha actual
+							LocalDate fechaReservaV = LocalDate.now();
+
+							// Crear nueva reserva sin proporcionar el argumento numRH
+							ReservasV nuevaReservaV = new ReservasV(dniIngresado, codV, aReservasV.size() + 1,
+									fechaReservaV);
+
+							// Verificar si el socio tiene derecho a descuento
+							/*
+							 * if (esSocio) { // Aplicar descuento del 30% double precioConDescuento =
+							 * nuevaReservaV.aplicarDescuento(vueloSeleccionado.getPrecio());
+							 * nuevaReservaV.setPrecio(precioConDescuento); }
+							 */
+
+							// Agregar nueva reserva a la lista de reservas de vuelos
+							aReservasV.add(nuevaReservaV);
+
+							// Agregar nueva reserva a la lista de reservas de vuelos
+							aReservasV.add(nuevaReservaV);
+							agregadorv = true;
+
+							System.out.println("Reserva realizada con éxito.");
+
+						}
+						break;
+					case 3:
+						// Mostrar reservas del usuario
+						System.out.println("Reservas de Hotel realizadas por el usuario con DNI " + dniIngresado + ":");
+						boolean reservasEncontradasH = false;
+						for (ReservasH reservah : aReservasH) {
+							if (reservah.getDni().equals(dniIngresado)) {
+								Hoteles hotelReservado = null;
+								for (Hoteles hotel : aHoteles) {
+									if (hotel.getCodH().equals(reservah.getCodH())) {
+										hotelReservado = hotel;
+										break;
+									}
 								}
+								System.out.println("Reserva de hotel en " + hotelReservado.getNombre() + " de código "
+										+ reservah.getCodH() + " para el día " + reservah.getFechaRH()
+										+ " con número de reserva " + reservah.getNumRH());
+								reservasEncontradasH = true;
 							}
 						}
-
-						// Eliminar la reserva de la lista de reservas de hoteles
-						listaReservasH.remove(hotelCancelar);
-
-						// Eliminar la reserva del objeto Cliente o Socio correspondiente
-						if (esSocio) {
-							socioCancelar.eliminarReservaH(hotelCancelar);
-						} else {
-							clienteCancelar.eliminarReservaH(hotelCancelar);
+						if (!reservasEncontradasH) {
+							System.out.println("No se encontraron reservas para el usuario con DNI " + dniIngresado);
 						}
-
-						System.out.println("Reserva de hotel cancelada satisfactoriamente.");
-					} else {
-						System.out.println("Reserva de hotel no encontrada.");
-						canceladoh = true;
-					}
-					break;
-
-				case 7:
-					System.out.print("Ingrese el número de reserva del Vuelo cancelar: ");
-					int numReservaCancelar2 = scanner.nextInt();
-					scanner.nextLine();
-
-					// Buscar la reserva correspondiente al número ingresado en la lista de reservas
-					// de hoteles
-					ReservasV vueloCancelar = null;
-					for (ReservasV rv : listaReservasV) {
-						if (rv.getNumRV() == numReservaCancelar2) {
-							vueloCancelar = rv;
-							break;
+						break;
+					case 4:
+						// Mostrar reservas del usuario
+						System.out.println("Reservas de Vuelo realizadas por el usuario con DNI " + dniIngresado + ":");
+						boolean reservasEncontradasV = false;
+						for (ReservasV reservav : aReservasV) {
+							if (reservav.getDni().equals(dniIngresado)) {
+								Vuelos vueloReservado = null;
+								for (Vuelos vuelo : aVuelos) {
+									if (vuelo.getCodV().equals(reservav.getCodV())) {
+										vueloReservado = vuelo;
+										break;
+									}
+								}
+								System.out.println("Reserva de hotel en " + vueloReservado.getAerolinea()
+										+ " de código " + reservav.getCodV() + " para el día " + reservav.getFechaRV()
+										+ " con número de reserva " + reservav.getNumRV());
+								reservasEncontradasV = true;
+							}
 						}
-					}
+						if (!reservasEncontradasV) {
+							System.out.println("No se encontraron reservas para el usuario con DNI " + dniIngresado);
+						}
+						break;
+					case 5:
+						// Modificar reserva de hotel
+						System.out.print("Introduzca el número de reserva de Hotel que desea modificar: ");
+						numRH = scanner.nextInt();
+						scanner.nextLine(); // Consumir el carácter de salto de línea restante
 
-					// Si se encontró la reserva en la lista de reservas de hoteles, cancelarla y
-					// eliminarla de la lista
-					if (vueloCancelar != null) {
-						// Obtener el objeto Cliente o Socio correspondiente al DNI del usuario
-						Clientes clienteCancelar = null;
-						Socios socioCancelar = null;
-						boolean esSocio = false;
-
-						for (Clientes c : listaClientes) {
-							if (c.getDni().equals(dni)) {
-								clienteCancelar = c;
-								System.out.println("Cliente encontrado: " + clienteCancelar);
+						// Buscar reserva en la lista de reservas de hotel
+						ReservasH reservaModificarH = null;
+						for (ReservasH reservah : aReservasH) {
+							if (reservah.getNumRH() == numRH) {
+								reservaModificarH = reservah;
 								break;
 							}
 						}
 
-						if (clienteCancelar == null) {
-							for (Socios s : listaSocios) {
-								if (s.getDni().equals(dniVerificado)) {
-									socioCancelar = s;
-									System.out.println("Socio encontrado: " + socioCancelar);
-									esSocio = true;
-									break;
-								}
+						// Verificar si la reserva fue encontrada
+						if (reservaModificarH == null) {
+							System.out.println("La reserva ingresada no es válida.");
+							System.out.println("Por favor introduzca un número de reserva válido.");
+						} else {
+							// Pedir al usuario que ingrese el nuevo código de hotel
+							System.out.print("Introduzca el nuevo código de hotel: ");
+							nuevoCodH = scanner.nextLine();
+
+							// Actualizar el código de hotel en la reserva correspondiente
+							reservaModificarH.setCodH(nuevoCodH);
+
+							System.out.println("La reserva de su Hotel ha sido modificada correctamente.");
+							modificadorh = true;
+						}
+						break;
+					case 6:
+						// Modificar reserva de hotel
+						System.out.print("Introduzca el número de reserva de Vuelo que desea modificar: ");
+						numRV = scanner.nextInt();
+						scanner.nextLine(); // Consumir el carácter de salto de línea restante
+
+						// Buscar reserva en la lista de reservas de hotel
+						ReservasV reservaModificarV = null;
+						for (ReservasV reservav : aReservasV) {
+							if (reservav.getNumRV() == numRV) {
+								reservaModificarV = reservav;
+								break;
 							}
 						}
 
-						// Eliminar la reserva de la lista de reservas de hoteles
-						listaReservasV.remove(vueloCancelar);
-
-						// Eliminar la reserva del objeto Cliente o Socio correspondiente
-						if (esSocio) {
-							socioCancelar.eliminarReservaV(vueloCancelar);
+						// Verificar si la reserva fue encontrada
+						if (reservaModificarV == null) {
+							System.out.println("La reserva ingresada no es válida.");
+							System.out.println("Por favor introduzca un número de reserva válido.");
 						} else {
-							clienteCancelar.eliminarReservaV(vueloCancelar);
+							// Pedir al usuario que ingrese el nuevo código de hotel
+							System.out.print("Introduzca el nuevo código del Vuelo: ");
+							nuevoCodV = scanner.nextLine();
+
+							// Actualizar el código de hotel en la reserva correspondiente
+							reservaModificarV.setCodV(nuevoCodV);
+
+							System.out.println("La reserva ha sido modificada correctamente.");
+							modificadorv = true;
+						}
+						break;
+					case 7:
+						// Eliminar reserva de hotel
+						System.out.print("Introduzca el número de reserva de Hotel que desea eliminar: ");
+						numRH = scanner.nextInt();
+						scanner.nextLine(); // Consumir el carácter de salto de línea restante
+
+						// Buscar reserva en la lista de reservas de hotel
+						ReservasH reservaEliminarH = null;
+						for (ReservasH reservah : aReservasH) {
+							if (reservah.getNumRH() == numRH && reservah.getDni().equals(dniIngresado)) {
+								reservaEliminarH = reservah;
+								break;
+							}
 						}
 
-						System.out.println("Reserva de hotel cancelada satisfactoriamente.");
-					} else {
-						System.out.println("Reserva de hotel no encontrada.");
-						canceladov = true;
-					}
-					break;
+						// Verificar si la reserva fue encontrada
+						if (reservaEliminarH == null) {
+							System.out.println("La reserva ingresada no es válida o no pertenece al usuario con DNI "
+									+ dniIngresado + ".");
+							System.out.println("Por favor introduzca un número de reserva válido.");
+						} else {
+							// Eliminar la reserva correspondiente
+							aReservasH.remove(reservaEliminarH);
+							System.out.println("La reserva ha sido eliminada correctamente.");
+							eliminadorh = true;
+						}
 
-				case 8:
-					System.out.println("Gracias por elegirnos. Hasta luego.");
-					break;
-				default:
-					System.out.println("Opción inválida, por favor seleccione otra");
+						break;
+					case 8:
+						// Eliminar reserva de vuelo
+						System.out.print("Introduzca el número de reserva del Vuelo que desea eliminar: ");
+						numRV = scanner.nextInt();
+						scanner.nextLine(); // Consumir el carácter de salto de línea restante
+
+						// Buscar reserva en la lista de reservas de vuelo
+						ReservasV reservaEliminarV = null;
+						for (ReservasV reservav : aReservasV) {
+							if (reservav.getNumRV() == numRV && reservav.getDni().equals(dniIngresado)) {
+								reservaEliminarV = reservav;
+								break;
+							}
+						}
+
+						// Verificar si la reserva fue encontrada
+						if (reservaEliminarV == null) {
+							System.out.println("La reserva ingresada no es válida o no pertenece al usuario con DNI "
+									+ dniIngresado + ".");
+							System.out.println("Por favor introduzca un número de reserva válido.");
+						} else {
+							// Eliminar la reserva correspondiente
+							aReservasV.remove(reservaEliminarV);
+							System.out.println("La reserva de su Vuelo ha sido eliminada correctamente.");
+							eliminadorv = true;
+						}
+						break;
+
+					case 9:
+						System.out.println("Gracias por elegirnos. Hasta luego.");
+						break;
+
+					default:
+						System.out.println("Opción inválida, por favor seleccione otra");
+						break;
+					}
+				} catch (InputMismatchException e) {
+					System.out.println("Opción no válida. Intente de nuevo.");
+					scanner.nextLine(); // Limpiar el buffer de entrada para evitar un bucle infinito
 				}
-			} while (opcion != 8);
+			} while (opcion != 9);
 			scanner.close();
+			if (agregadorh) {
+				try {
+					Connection conexion = DriverManager.getConnection("jdbc:mysql://localhost/agencia_de_viajes",
+							"root", "");
+					Statement st = conexion.createStatement();
 
-			if (modificadoh) {
-			    try {
-			        Connection conexion = DriverManager.getConnection("jdbc:mysql://localhost/agencia_de_viajes", "root", "");
+					// Eliminar todas las reservas previas de hoteles
+					String consulta = "DELETE FROM reservash;";
+					st.executeUpdate(consulta);
 
-			        // Borro todas las reservas de hotel existentes
-			        Statement st = conexion.createStatement();
-			        String consulta = "DELETE FROM reservash;";
-			        st.executeUpdate(consulta);
-			        st.close();
+					// Insertar las nuevas reservas
+					consulta = "INSERT INTO reservash (dni, codH, numRH, fechaRH) VALUES (?, ?, ?, ?)";
+					PreparedStatement ps = conexion.prepareStatement(consulta);
 
-			        // Inserto las nuevas reservas de hotel
-			        PreparedStatement ps = conexion.prepareStatement("INSERT INTO reservash (numRH, dni, codH, fechaRH) VALUES (?, ?, ?, ?)");
-			        for (posicion = 0; posicion < listaReservasH.size(); posicion++) {
-			            ReservasH rhbd1 = listaReservasH.get(posicion);
-			            System.out.println("Insertando reserva: " + rhbd1);
-			            ps.setInt(1, ReservasH.getNumRH());
-			            ps.setString(2, rhbd1.getClientes().getDni());
-			            ps.setString(3, rhbd1.getHoteles().getCodH());
-			            ps.setDate(4, java.sql.Date.valueOf(rhbd1.getFechaRH()));
-			            ps.executeUpdate();
-			        }
-			        ps.close();
+					for (ReservasH reservah : aReservasH) {
+						String dni = reservah.getDni();
+						numRH = reservah.getNumRH();
+						String codH = reservah.getCodH();
+						LocalDate fechaRH = reservah.getFechaRH();
 
-			        System.out.println("Reservas de hotel actualizadas correctamente.");
-			        conexion.close();
-			    } catch (SQLException e) {
-			        System.err.println("Error al actualizar las reservas de hotel: " + e.getMessage());
-			    }
-			}
+						ps.setString(1, dni);
+						ps.setString(2, codH);
+						ps.setInt(3, numRH);
+						ps.setDate(4, java.sql.Date.valueOf(fechaRH));
 
+						ps.executeUpdate();
+					}
 
-		}
-		
-	}
-	
+					// Cerrar el statement y la conexión
+					st.close();
+					conexion.close();
 
-	private static String verificarDni(String dni, ArrayList<Clientes> listaClientes, ArrayList<Socios> listaSocios) {
+					System.out.println("Las reservas de hoteles se han cargado correctamente en la base de datos.");
 
-		for (Clientes listadoClientes : listaClientes) {
-			if (listadoClientes.getDni().equals(dni)) {
-				return "cliente";
-			}
-		}
-		for (Socios listadoSocios : listaSocios) {
-			if (listadoSocios.getDni().equals(dni)) {
-				return "socio";
-			}
-		}
-		return dni;
-	}
-
-	private static String obtenerNombreUsuario(String tipoUsuario, String dni, ArrayList<Clientes> listaClientes,
-			ArrayList<Socios> listaSocios) {
-		if (tipoUsuario.equals("cliente")) {
-			for (Clientes listadoClientes : listaClientes) {
-				if (listadoClientes.getDni().equals(dni)) {
-					return listadoClientes.getNombre();
+				} catch (SQLException e) {
+					System.out.println("Error al cargar las reservas de hoteles en la base de datos.");
 				}
 			}
-		} else if (tipoUsuario.equals("socio")) {
-			for (Socios listadoSocios : listaSocios) {
-				if (listadoSocios.getDni().equals(dni)) {
-					return listadoSocios.getNombre();
+			if (agregadorv) {
+				try {
+					Connection conexion = DriverManager.getConnection("jdbc:mysql://localhost/agencia_de_viajes",
+							"root", "");
+					Statement st = conexion.createStatement();
+
+					// Eliminar todas las reservas previas de hoteles
+					String consulta = "DELETE FROM reservasv;";
+					st.executeUpdate(consulta);
+
+					// Insertar las nuevas reservas
+					consulta = "INSERT INTO reservasv (dni, codV, numRV, fechaRV) VALUES (?, ?, ?, ?)";
+					PreparedStatement ps = conexion.prepareStatement(consulta);
+
+					for (ReservasV reservav : aReservasV) {
+						String dni = reservav.getDni();
+						numRV = reservav.getNumRV();
+						String codV = reservav.getCodV();
+						LocalDate fechaRV = reservav.getFechaRV();
+
+						ps.setString(1, dni);
+						ps.setString(2, codV);
+						ps.setInt(3, numRV);
+						ps.setDate(4, java.sql.Date.valueOf(fechaRV));
+
+						ps.executeUpdate();
+					}
+
+					// Cerrar el statement y la conexión
+					st.close();
+					conexion.close();
+
+					System.out.println("Las reservas de vuelos se han cargado correctamente en la base de datos.");
+
+				} catch (SQLException e) {
+					System.out.println("Error al cargar las reservas de vuelos en la base de datos.");
 				}
 			}
+			if (modificadorh) {
+				try {
+					Connection conexion = DriverManager.getConnection("jdbc:mysql://localhost/agencia_de_viajes",
+							"root", "");
+					// Eliminar todas las reservas previas de hoteles
+					String consulta = "UPDATE reservash SET codH = ? WHERE numRH = ?";
+					PreparedStatement ps = conexion.prepareStatement(consulta);
+					ps.setString(1, nuevoCodH);
+					ps.setInt(2, numRH);
+					ps.executeUpdate();
+					ps.close();
+					conexion.close();
+					System.out.println("Su Hotel se ha modificado correctamente en la base de datos.");
+				} catch (SQLException e) {
+					System.out.println(e);
+				}
+			}
+			if (modificadorv) {
+				try {
+					Connection conexion = DriverManager.getConnection("jdbc:mysql://localhost/agencia_de_viajes",
+							"root", "");
+					// Eliminar todas las reservas previas de hoteles
+					String consulta = "UPDATE reservasv SET codV = ? WHERE numRV = ?";
+					PreparedStatement ps = conexion.prepareStatement(consulta);
+					ps.setString(1, nuevoCodV);
+					ps.setInt(2, numRV);
+					ps.executeUpdate();
+					ps.close();
+					conexion.close();
+					System.out.println("Su vuelo se ha modificado correctamente en la base de datos.");
+				} catch (SQLException e) {
+					System.out.println(e);
+				}
+			}
+			if (eliminadorh) {
+				try {
+					Connection conexion = DriverManager.getConnection("jdbc:mysql://localhost/agencia_de_viajes",
+							"root", "");
+					// Eliminar la reserva de hotel correspondiente
+					String consulta = "DELETE FROM reservash WHERE numRH = ?";
+					PreparedStatement ps = conexion.prepareStatement(consulta);
+					ps.setInt(1, numRH);
+					int filasAfectadas = ps.executeUpdate();
+					ps.close();
+					conexion.close();
+					if (filasAfectadas > 0) {
+						System.out.println("La reserva ha sido eliminada correctamente de la base de datos.");
+						eliminadorh = true;
+					} else {
+						System.out.println("La reserva ingresada no es válida o no pertenece al usuario con DNI "
+								+ dniIngresado + ".");
+						System.out.println("Por favor introduzca un número de reserva válido.");
+					}
+				} catch (SQLException e) {
+					System.out.println(e);
+				}
+			}
+			if (eliminadorv) {
+				try {
+					Connection conexion = DriverManager.getConnection("jdbc:mysql://localhost/agencia_de_viajes",
+							"root", "");
+					// Eliminar la reserva de hotel correspondiente
+					String consulta = "DELETE FROM reservasv WHERE numRV = ?";
+					PreparedStatement ps = conexion.prepareStatement(consulta);
+					ps.setInt(1, numRV);
+					int filasAfectadas = ps.executeUpdate();
+					ps.close();
+					conexion.close();
+					if (filasAfectadas > 0) {
+						System.out.println("La reserva ha sido eliminada correctamente de la base de datos.");
+						eliminadorv = true;
+					} else {
+						System.out.println("La reserva ingresada no es válida o no pertenece al usuario con DNI "
+								+ dniIngresado + ".");
+						System.out.println("Por favor introduzca un número de reserva válido.");
+					}
+				} catch (SQLException e) {
+					System.out.println(e);
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "Se ha producido un error", e);
+			LOGGER.info("LOGGER PRUEBA ERRORES");
+		} finally {
+			if (fileHandler != null) {
+				fileHandler.close();
+			}
 		}
-		return null;
 	}
 }

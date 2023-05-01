@@ -1,43 +1,58 @@
 package agenciadeviajes;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
-public class ReservasV {
+public class ReservasV implements DescuentoSocio{
+	/**
+
+	La clase ReservasV representa una reserva de vuelo realizada por un usuario,
+	la cual contiene información sobre el usuario, el vuelo, el número de reserva y la fecha de la reserva.
+	También implementa la interfaz DescuentoSocio para aplicar descuentos a las reservas realizadas por los socios.
+	*/
     
-	private static int numRV = 0; // Inicializar numRH a 0
+	private String dni;
+	private String codV;
+	private int numRV;
     private LocalDate fechaRV;
-    //private String dni;
-    //private String codH;
-    private Clientes clientes; // Cambiar a Cliente en lugar de ArrayList<Cliente>
-    private Socios socios; // Cambiar a Socio en lugar de ArrayList<Socio>
-    private Vuelos vuelos; // Cambiar a Hotel en lugar de ArrayList<Hotel>
     
-   private static List<ReservasV> reservasv = new ArrayList<>();
+    public ReservasV() {
+    	this.dni = "";
+        this.codV = "";
+        this.numRV= 0;
+        this.fechaRV = null;
+   	}
 
-    
-    public ReservasV(Clientes cliente, Socios socio, Vuelos vuelo) {
-    	this.clientes = cliente;
-        this.socios = socio;
-        this.vuelos = vuelo;
-        ReservasV.numRV = (int) (Math.random() * 1000) + 1; // Generar un número aleatorio entre 1 y 1000
-        this.fechaRV = LocalDate.now();
-        //this.dni = cliente.getDni(); // Obtener el DNI del cliente
-        //this.codH = hotel.getCodH(); // Obtener el código del hotel
-
+    // Constructor que recibe los parámetros necesarios para crear una reserva
+    public ReservasV(String dni, String codV, int numRV, LocalDate fechaRV) {
+    	this.dni = dni;
+        this.codV = codV;
+        this.numRV = numRV;
+        this.fechaRV = fechaRV;
+ 
     }
 
-	/*public ReservasV(ArrayList<ReservasV> listaReservasV) {
-		// TODO Auto-generated constructor stub
-	}*/
-
-	public ReservasV() {
-		// TODO Auto-generated constructor stub
+	public String getDni() {
+		return dni;
 	}
 
-	public static int getNumRV() {
+	public void setDni(String dni) {
+		this.dni = dni;
+	}
+
+	public String getCodV() {
+		return codV;
+	}
+
+	public void setCodV(String codV) {
+		this.codV = codV;
+	}
+
+	public int getNumRV() {
 		return numRV;
+	}
+
+	public void setNumRV(int numRV) {
+		this.numRV = numRV;
 	}
 
 	public LocalDate getFechaRV() {
@@ -45,58 +60,19 @@ public class ReservasV {
 	}
 
 	public void setFechaRV(LocalDate fechaRV) {
+		this.fechaRV = fechaRV;
 	}
-	// Método getter para el atributo cliente
-    public Clientes getClientes() {
-        return clientes;
-    }
-    public void setClientes(Clientes cliente) {
-    	
-    }
- // Método getter para el atributo socio
-    public Socios getSocios() {
-        return socios;
-    }
-    public void setSocios(Socios socio) {
-    	
-    }
 
-    // Método getter para el atributo dni
-    //public void getDni(String dni) {
-     //   this.dni = dni;
-    //}
-    public void setCodV(Vuelos nuevoVueloElegido) {
+	@Override
+	public String toString() {
+		return "ReservasV [dni=" + dni + ", codV=" + codV + ", numRV=" + numRV + ", fechaRV=" + fechaRV + "]";
+	}
+
+	@Override
+	public double aplicarDescuento(double precio) {
 		// TODO Auto-generated method stub
-		
-	}
-	
-
-    @Override
-    public String toString() {
-        String dni = "";
-        if (clientes instanceof Clientes) {
-            dni = ((Clientes) clientes).getDni();
-        } else if (socios instanceof Socios) {
-            dni = ((Socios) socios).getDni();
-        }
-        return "Reserva [numRV=" + numRV + ", fechaRH=" + fechaRV + ", dni=" + dni + ", codV=" + vuelos.getCodV() + "]";
-    }
-
-	public static List<ReservasV> getReservasv() {
-		return reservasv;
+		return 0;
 	}
 
-	public static void setReservasv(List<ReservasV> reservasv) {
-		ReservasV.reservasv = reservasv;
-	}
-	public void setVuelos(Vuelos nuevoVueloElegido) {
-	    this.vuelos = nuevoVueloElegido;
-	}
-	public void eliminarReservaV(ReservasV reserva) {
-	    this.reservasv.remove(reserva);
-	    reserva.setClientes(null);
-	    reserva.setSocios(null);
-	    reserva.setCodV(null);
-	}
 }
    

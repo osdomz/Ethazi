@@ -1,10 +1,17 @@
 package agenciadeviajes;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public abstract class Personas {
+	/**
+
+	La clase abstracta Personas representa a una persona con su información básica
+	como DNI, nombre, apellidos, edad, teléfono y correo electrónico.
+	Esta clase cuenta con constructores para inicializar los atributos, métodos para
+	acceder y modificar dichos atributos, y un método abstracto para imprimir información
+	específica de la persona (implementado en las clases hijas).
+	*/
+	
     protected String dni;
     protected String nombre;
     protected String apellido1;
@@ -14,7 +21,16 @@ public abstract class Personas {
     protected String email;
     
     public Personas () {
-    	
+    	 
+    }
+    public Personas(Personas p) {
+    	 this.dni = p.dni;
+         this.nombre = p.nombre;
+         this.apellido1 = p.apellido1;
+         this.apellido2 = p.apellido2;
+         this.edad = p.edad;
+         this.telefono = p.telefono;
+         this.email = p.email;
     }
 
     public Personas(String dni, String nombre, String apellido1, String apellido2, int edad, String telefono, String email) {
@@ -26,10 +42,6 @@ public abstract class Personas {
         this.telefono = telefono;
         this.email = email;
     }
-
-    
-    public abstract void leer(Scanner sc);
-    public abstract void print();
     
     public String getDni() {
         return dni;
@@ -92,6 +104,7 @@ public abstract class Personas {
 		return "Personas [dni=" + dni + ", nombre=" + nombre + ", apellido1=" + apellido1 + ", apellido2=" + apellido2
 				+ ", edad=" + edad + ", telefono=" + telefono + ", email=" + email + "]";
 	}
+	public abstract void print();
 
 }
     
